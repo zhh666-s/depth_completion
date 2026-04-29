@@ -1,0 +1,46 @@
+<launch>
+    <arg name="enable_tf32" default="true" />
+    <arg name="cudnn_benchmark" default="true" />
+    <arg name="use_torch_compile" default="false" />
+    <arg name="compile_mode" default="reduce-overhead" />
+    <arg name="use_channels_last" default="false" />
+    <arg name="publish_disp" default="false" />
+    <arg name="publish_vis" default="true" />
+    <arg name="input_queue_size" default="1" />
+    <arg name="sync_queue_size" default="2" />
+    <arg name="max_input_age" default="0.25" />
+    <arg name="infer_width" default="0" />
+    <arg name="infer_height" default="0" />
+
+    <node pkg="ffs_ros" type="ffs_topic_node_conda.sh" name="ffs_topic_node" output="screen">
+        <param name="left_topic" value="/camera/left/image_raw" />
+        <param name="right_topic" value="/camera/right/image_raw" />
+
+        <param name="disp_topic" value="/ffs/disp" />
+        <param name="vis_topic" value="/ffs/vis" />
+        <param name="publish_disp" value="$(arg publish_disp)" />
+        <param name="publish_vis" value="$(arg publish_vis)" />
+
+        <param name="model_dir" value="$(find ffs_ros)/ffs_runtime/weights/20-26-39/model_best_bp2_serialize.pth" />
+
+        <param name="valid_iters" value="8" />
+        <param name="max_disp" value="192" />
+        <param name="hiera" value="0" />
+        <param name="skip" value="0" />
+        <param name="show_local" value="false" />
+        <param name="display_scale" value="0.8" />
+        <param name="sync_slop" value="0.03" />
+        <param name="input_queue_size" value="$(arg input_queue_size)" />
+        <param name="sync_queue_size" value="$(arg sync_queue_size)" />
+        <param name="max_input_age" value="$(arg max_input_age)" />
+        <param name="infer_width" value="$(arg infer_width)" />
+        <param name="infer_height" value="$(arg infer_height)" />
+
+        <!-- GPU acceleration switches -->
+        <param name="enable_tf32" value="$(arg enable_tf32)" />
+        <param name="cudnn_benchmark" value="$(arg cudnn_benchmark)" />
+        <param name="use_torch_compile" value="$(arg use_torch_compile)" />
+        <param name="compile_mode" value="$(arg compile_mode)" />
+        <param name="use_channels_last" value="$(arg use_channels_last)" />
+    </node>
+</launch>

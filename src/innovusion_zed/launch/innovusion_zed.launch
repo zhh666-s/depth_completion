@@ -1,0 +1,15 @@
+<launch>
+  <arg name="lidar_topic" default="/iv_points" />
+  <arg name="cam_topic" default="/camera/left/image_raw" />
+  <arg name="frame_id" default="innovusion" />
+  <arg name="param_path" default="$(find innovusion_zed)/config/camera_left.json" />
+  <arg name="publish_topic" default="/processed_points" />
+
+  <node pkg="innovusion_zed" type="innovusion_zed_node" name="innovusion_zed_node" output="screen">
+    <param name="lidar_topic" value="$(arg lidar_topic)" />
+    <param name="cam_topic" value="$(arg cam_topic)" />
+    <param name="frame_id" value="$(arg frame_id)" />
+    <param name="param_path" value="$(arg param_path)" />
+    <param name="publish_topic" value="$(arg publish_topic)" />
+  </node>
+</launch>

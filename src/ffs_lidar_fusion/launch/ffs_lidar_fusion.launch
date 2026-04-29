@@ -1,0 +1,47 @@
+<launch>
+  <arg name="left_topic" default="/camera/left/image_raw" />
+  <arg name="right_topic" default="/camera/right/image_raw" />
+  <arg name="left_info_topic" default="/camera/left/camera_info" />
+  <arg name="right_info_topic" default="/camera/right/camera_info" />
+  <arg name="lidar_topic" default="/iv_points" />
+  <arg name="ffs_disp_topic" default="/ffs/disp" />
+  <arg name="calib_json" default="$(find innovusion_zed)/config/camera_left.json" />
+
+  <arg name="visual_depth_topic" default="/ffs_lidar_fusion/visual_depth" />
+  <arg name="lidar_depth_topic" default="/ffs_lidar_fusion/lidar_depth" />
+  <arg name="fused_depth_topic" default="/ffs_lidar_fusion/fused_depth" />
+  <arg name="fused_depth_viz_topic" default="/ffs_lidar_fusion/fused_depth_viz" />
+  <arg name="debug_overlay_topic" default="/ffs_lidar_fusion/debug_overlay" />
+  <arg name="sync_slop" default="0.30" />
+  <arg name="max_lidar_age" default="0.50" />
+  <arg name="max_input_age" default="0.35" />
+  <arg name="lidar_stride" default="3" />
+  <arg name="publish_debug_overlay" default="false" />
+
+  <node pkg="ffs_lidar_fusion" type="ffs_lidar_fusion_node.py" name="ffs_lidar_fusion_node" output="screen">
+    <param name="left_topic" value="$(arg left_topic)" />
+    <param name="right_topic" value="$(arg right_topic)" />
+    <param name="left_info_topic" value="$(arg left_info_topic)" />
+    <param name="right_info_topic" value="$(arg right_info_topic)" />
+    <param name="lidar_topic" value="$(arg lidar_topic)" />
+    <param name="ffs_disp_topic" value="$(arg ffs_disp_topic)" />
+    <param name="calib_json" value="$(arg calib_json)" />
+
+    <param name="visual_depth_topic" value="$(arg visual_depth_topic)" />
+    <param name="lidar_depth_topic" value="$(arg lidar_depth_topic)" />
+    <param name="fused_depth_topic" value="$(arg fused_depth_topic)" />
+    <param name="fused_depth_viz_topic" value="$(arg fused_depth_viz_topic)" />
+    <param name="debug_overlay_topic" value="$(arg debug_overlay_topic)" />
+
+    <param name="sync_slop" value="$(arg sync_slop)" />
+    <param name="max_lidar_age" value="$(arg max_lidar_age)" />
+    <param name="max_input_age" value="$(arg max_input_age)" />
+    <param name="lidar_stride" value="$(arg lidar_stride)" />
+    <param name="min_disp" value="0.1" />
+    <param name="min_depth" value="0.3" />
+    <param name="max_depth" value="80.0" />
+    <param name="use_lidar_dilation" value="true" />
+    <param name="lidar_dilation_kernel" value="3" />
+    <param name="publish_debug_overlay" value="$(arg publish_debug_overlay)" />
+  </node>
+</launch>

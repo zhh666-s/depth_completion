@@ -1,0 +1,29 @@
+# Catkin generated artifacts
+/build/
+/devel/
+/install/
+/logs/
+
+# Crash dumps and large local artifacts
+/core
+/core.*
+/src/ffs_ros/ffs_runtime/scripts/core
+*.bag
+*.bag.active
+
+# Python caches
+__pycache__/
+*.py[cod]
+*.pyo
+
+# CMake and build byproducts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Editor and OS noise
+.DS_Store
+*~
+*.swp
+*.swo

@@ -1,0 +1,49 @@
+<launch>
+  <arg name="device_ip" default="192.168.1.13" />
+  <arg name="udp_port" default="8010" />
+
+  <arg name="camera_device" default="/dev/video0" />
+  <arg name="camera_namespace" default="camera" />
+  <arg name="camera_resolution" default="1" />
+  <arg name="camera_frame_rate" default="10" />
+  <arg name="camera_show_image" default="false" />
+  <arg name="camera_use_zed_config" default="true" />
+  <arg name="camera_config_file" default="$(find zed_cpu_ros)/config/SN16789.conf" />
+
+  <arg name="lidar_topic" default="/iv_points" />
+  <arg name="camera_topic" default="/camera/left/image_raw" />
+  <arg name="fusion_frame_id" default="innovusion" />
+  <arg name="fusion_param_path" default="$(find innovusion_zed)/config/camera_left.json" />
+  <arg name="fusion_output_topic" default="/processed_points" />
+
+  <arg name="start_lidar" default="true" />
+  <arg name="start_camera" default="true" />
+  <arg name="start_fusion" default="true" />
+  <arg name="start_rviz" default="true" />
+  <arg name="rviz_config" default="$(find innovusion_zed)/config/system_visual.rviz" />
+
+  <include file="$(find innovusion_pointcloud)/launch/innovusion_points.launch" if="$(arg start_lidar)">
+    <arg name="device_ip" value="$(arg device_ip)" />
+    <arg name="udp_port" value="$(arg udp_port)" />
+  </include>
+
+  <include file="$(find zed_cpu_ros)/launch/zed_cpu_ros.launch" if="$(arg start_camera)">
+    <arg name="config_file_location" value="$(arg camera_config_file)" />
+    <arg name="camera_namespace" value="$(arg camera_namespace)" />
+    <arg name="device_name" value="$(arg camera_device)" />
+    <arg name="resolution" value="$(arg camera_resolution)" />
+    <arg name="frame_rate" value="$(arg camera_frame_rate)" />
+    <arg name="show_image" value="$(arg camera_show_image)" />
+    <arg name="use_zed_config" value="$(arg camera_use_zed_config)" />
+  </include>
+
+  <include file="$(find innovusion_zed)/launch/innovusion_zed.launch" if="$(arg start_fusion)">
+    <arg name="lidar_topic" value="$(arg lidar_topic)" />
+    <arg name="cam_topic" value="$(arg camera_topic)" />
+    <arg name="frame_id" value="$(arg fusion_frame_id)" />
+    <arg name="param_path" value="$(arg fusion_param_path)" />
+    <arg name="publish_topic" value="$(arg fusion_output_topic)" />
+  </include>
+
+  <node pkg="rviz" type="rviz" name="innovusion_zed_rviz" args="-d $(arg rviz_config)" if="$(arg start_rviz)" />
+</launch>

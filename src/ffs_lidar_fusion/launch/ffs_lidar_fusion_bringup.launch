@@ -1,0 +1,33 @@
+<launch>
+  <arg name="left_topic" default="/camera/left/image_raw" />
+  <arg name="right_topic" default="/camera/right/image_raw" />
+  <arg name="left_info_topic" default="/camera/left/camera_info" />
+  <arg name="right_info_topic" default="/camera/right/camera_info" />
+  <arg name="lidar_topic" default="/iv_points" />
+  <arg name="calib_json" default="$(find innovusion_zed)/config/camera_left.json" />
+
+  <node pkg="ffs_ros" type="ffs_topic_node_conda.sh" name="ffs_topic_node" output="screen">
+    <param name="left_topic" value="$(arg left_topic)" />
+    <param name="right_topic" value="$(arg right_topic)" />
+    <param name="disp_topic" value="/ffs/disp" />
+    <param name="vis_topic" value="/ffs/vis" />
+    <param name="model_dir" value="$(find ffs_ros)/ffs_runtime/weights/20-26-39/model_best_bp2_serialize.pth" />
+    <param name="valid_iters" value="8" />
+    <param name="max_disp" value="192" />
+    <param name="hiera" value="0" />
+    <param name="skip" value="0" />
+    <param name="show_local" value="false" />
+    <param name="display_scale" value="0.8" />
+    <param name="sync_slop" value="0.03" />
+  </node>
+
+  <include file="$(find ffs_lidar_fusion)/launch/ffs_lidar_fusion.launch">
+    <arg name="left_topic" value="$(arg left_topic)" />
+    <arg name="right_topic" value="$(arg right_topic)" />
+    <arg name="left_info_topic" value="$(arg left_info_topic)" />
+    <arg name="right_info_topic" value="$(arg right_info_topic)" />
+    <arg name="lidar_topic" value="$(arg lidar_topic)" />
+    <arg name="ffs_disp_topic" value="/ffs/disp" />
+    <arg name="calib_json" value="$(arg calib_json)" />
+  </include>
+</launch>
