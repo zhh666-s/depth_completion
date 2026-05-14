@@ -134,6 +134,8 @@ public:
         pcl::PointCloud<pcl::PointXYZRGB>::Ptr completed_points;
     };
 
+    cv::Mat projectSparseDepth(const Eigen::MatrixXf& points) const;
+
     // 处理函数
     ForwardOutput forward(const Eigen::MatrixXf& points, const cv::Mat& image);
 };

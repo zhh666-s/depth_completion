@@ -435,6 +435,13 @@ void CompletionModule::process(cv::Mat& depth, const Eigen::MatrixXf& points) {
     depthConstraintLayer(depth, lidar, FULL_KERNEL_9);
 }
 
+cv::Mat CompletionModule::projectSparseDepth(const Eigen::MatrixXf& points) const {
+    cv::Mat sparse_depth_u16 = xyz2depth(points);
+    cv::Mat sparse_depth;
+    sparse_depth_u16.convertTo(sparse_depth, CV_32F, 1.0 / DEPTH_SCALE);
+    return sparse_depth;
+}
+
 CompletionModule::ForwardOutput CompletionModule::forward(const Eigen::MatrixXf& points, const cv::Mat& image) {
     // 1. 图像去畸变
     cv::Mat undistorted_image; 
@@ -442,9 +449,7 @@ CompletionModule::ForwardOutput CompletionModule::forward(const Eigen::MatrixXf&
     cv::remap(image, undistorted_image, map1_, map2_, cv::INTER_LINEAR);
 
     // 2. 点云转深度图
-    cv::Mat sparse_depth_u16 = xyz2depth(points);
-    cv::Mat sparse_depth;
-    sparse_depth_u16.convertTo(sparse_depth, CV_32F, 1.0 / DEPTH_SCALE);
+    cv::Mat sparse_depth = projectSparseDepth(points);
 
     cv::Mat depth = sparse_depth.clone();
 

@@ -16,9 +16,11 @@ find_package(catkin REQUIRED COMPONENTS
   message_filters
   pcl_ros
   pcl_conversions
+  roslib
 )
 
 find_package(PCL REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem system)
 # find_package(OpenMP)
 include_directories(${PCL_INCLUDE_DIRS})
 
@@ -39,7 +41,7 @@ include_directories(
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}_node
-    CATKIN_DEPENDS roscpp sensor_msgs cv_bridge image_transport message_filters pcl_ros pcl_conversions
+    CATKIN_DEPENDS roscpp sensor_msgs cv_bridge image_transport message_filters pcl_ros pcl_conversions roslib
 )
 
 add_executable(${PROJECT_NAME}_node 
@@ -52,6 +54,18 @@ add_executable(${PROJECT_NAME}_node
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
+)
+
+add_executable(true_data_collector_node
+  src/true_data_collector_node.cpp
+  src/parameter.cpp
+  src/completion_model.cpp
+)
+
+target_link_libraries(true_data_collector_node
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+  ${Boost_LIBRARIES}
 )
 
 # # 添加OpenMP链接

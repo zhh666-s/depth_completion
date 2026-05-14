@@ -40,6 +40,12 @@ catkin_package(
 add_executable(zed_cpu_ros src/zed_cpu_ros.cpp)
 target_link_libraries(zed_cpu_ros ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
 
+catkin_install_python(PROGRAMS
+    scripts/calibrate_intrinsics.py
+    scripts/calibrate_extrinsics.py
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 # install(TARGETS 
 #        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
