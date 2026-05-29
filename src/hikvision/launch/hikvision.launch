@@ -1,0 +1,30 @@
+<launch>
+  <arg name="camera_ip" default="192.168.1.64"/>
+  <arg name="username" default="admin"/>
+  <arg name="password" default="hyzx_hyzx"/>
+  <arg name="stream_channel" default="101"/>
+  <arg name="rtsp_url" default="rtsp://$(arg username):$(arg password)@$(arg camera_ip):554/Streaming/Channels/$(arg stream_channel)"/>
+
+  <arg name="image_topic" default="/hikvison/image_raw"/>
+  <arg name="frame_id" default="hikvision_camera"/>
+  <arg name="encoding" default="bgr8"/>
+  <arg name="capture_backend" default="ffmpeg"/>
+  <arg name="ffmpeg_capture_options" default="rtsp_transport;tcp"/>
+  <arg name="target_fps" default="0.0"/>
+  <arg name="reconnect_delay" default="2.0"/>
+  <arg name="read_fail_limit" default="25"/>
+  <arg name="show_local" default="false"/>
+
+  <node pkg="hikvision" type="hikvision_node.py" name="hikvision_node" output="screen">
+    <param name="rtsp_url" value="$(arg rtsp_url)"/>
+    <param name="image_topic" value="$(arg image_topic)"/>
+    <param name="frame_id" value="$(arg frame_id)"/>
+    <param name="encoding" value="$(arg encoding)"/>
+    <param name="capture_backend" value="$(arg capture_backend)"/>
+    <param name="ffmpeg_capture_options" value="$(arg ffmpeg_capture_options)"/>
+    <param name="target_fps" value="$(arg target_fps)"/>
+    <param name="reconnect_delay" value="$(arg reconnect_delay)"/>
+    <param name="read_fail_limit" value="$(arg read_fail_limit)"/>
+    <param name="show_local" value="$(arg show_local)"/>
+  </node>
+</launch>

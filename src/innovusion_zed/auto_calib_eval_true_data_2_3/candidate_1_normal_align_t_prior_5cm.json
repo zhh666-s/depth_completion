@@ -1,0 +1,133 @@
+{
+    "channel": "/camera/left/image_raw/compressed",
+    "distortion": [
+        -0.167711755843783,
+        0.00336788019834088,
+        -0.000223684229452583,
+        3.33772434227667e-05,
+        0.0202911583295034
+    ],
+    "image_size": [
+        1920,
+        1080
+    ],
+    "intrinsic": [
+        1405.34054844794,
+        0,
+        1003.15813578841,
+        0,
+        1405.07171198432,
+        555.982366854577,
+        0,
+        0,
+        1
+    ],
+    "modality": "camera",
+    "rotation": [
+        -0.0026451421984684687,
+        0.005831243455019203,
+        0.9999794997011276,
+        -0.9999023916520497,
+        0.013703370909107615,
+        -0.0027248475626238935,
+        -0.013718979235423943,
+        -0.9998891009634504,
+        0.005794426912326428
+    ],
+    "target": "lidar",
+    "translation": [
+        0.039018729773994495,
+        0.06629756415080988,
+        -0.07002854702762422
+    ],
+    "undistort_distortion": [
+        0.00581077608130668,
+        -0.0260143262656331,
+        -0.000151803969721494,
+        3.30143823155433e-05,
+        0.0317531594642784
+    ],
+    "undistort_intrinsic": [
+        1404.91219307137,
+        0,
+        1003.97812789865,
+        0,
+        1404.7635988362,
+        554.642126660193,
+        0,
+        0,
+        1
+    ],
+    "_auto_calib_method": "normal_align_t_prior_5cm",
+    "_source_data": [
+        "src/innovusion_zed/data/true_data_2",
+        "src/innovusion_zed/data/true_data_3"
+    ],
+    "_reference_config": "src/innovusion_zed/config/camera_left.json",
+    "_used_samples": [
+        "true_data_2/sample_0000_407.926895",
+        "true_data_2/sample_0000_980.636311",
+        "true_data_2/sample_0001_983.436309",
+        "true_data_2/sample_0002_983.536300",
+        "true_data_2/sample_0003_983.636289",
+        "true_data_2/sample_0004_1005.836820",
+        "true_data_2/sample_0005_1008.736846",
+        "true_data_2/sample_0006_1008.836854",
+        "true_data_2/sample_0007_1008.936865",
+        "true_data_2/sample_0008_1009.036874",
+        "true_data_2/sample_0009_1021.137049",
+        "true_data_2/sample_0010_1021.237066",
+        "true_data_2/sample_0011_1021.337078",
+        "true_data_2/sample_0012_1024.337098",
+        "true_data_3/sample_0000_152.826227",
+        "true_data_3/sample_0001_153.626323",
+        "true_data_3/sample_0002_198.727121",
+        "true_data_3/sample_0003_198.827120",
+        "true_data_3/sample_0004_212.327277",
+        "true_data_3/sample_0005_212.427287",
+        "true_data_3/sample_0006_236.327536",
+        "true_data_3/sample_0007_236.427531",
+        "true_data_3/sample_0008_247.127257",
+        "true_data_3/sample_0009_247.227258",
+        "true_data_3/sample_0010_255.127632",
+        "true_data_3/sample_0011_255.227629",
+        "true_data_3/sample_0012_333.728735",
+        "true_data_3/sample_0013_333.828745",
+        "true_data_3/sample_0014_340.329004",
+        "true_data_3/sample_0015_340.428990",
+        "true_data_3/sample_0016_405.929683",
+        "true_data_3/sample_0017_406.029683",
+        "true_data_3/sample_0018_419.929618",
+        "true_data_3/sample_0019_420.029617",
+        "true_data_3/sample_0020_421.829707",
+        "true_data_3/sample_0021_434.529709",
+        "true_data_3/sample_0022_434.629720",
+        "true_data_3/sample_0023_478.530624",
+        "true_data_3/sample_0024_478.630626",
+        "true_data_3/sample_0025_487.330784",
+        "true_data_3/sample_0026_487.430777",
+        "true_data_3/sample_0027_500.831062",
+        "true_data_3/sample_0028_500.931062",
+        "true_data_3/sample_0029_550.831747",
+        "true_data_3/sample_0030_550.931750",
+        "true_data_3/sample_0031_574.832144",
+        "true_data_3/sample_0032_574.932151",
+        "true_data_3/sample_0033_584.432363",
+        "true_data_3/sample_0034_584.532365"
+    ],
+    "_metrics": {
+        "ang_mean": 1.0008177404657495,
+        "ang_max": 1.853727539994868,
+        "dist_abs": 0.03692683864697562,
+        "dist_max": 0.07384391836876159,
+        "center_mean": 0.15091946282466898,
+        "center_max": 0.2970544258379601,
+        "drot": 1.442118118034978,
+        "dt_norm": 0.003684870230006455
+    },
+    "_delta_translation": [
+        0.002937991936634944,
+        0.0022207009429632135,
+        0.00012230827518271148
+    ]
+}

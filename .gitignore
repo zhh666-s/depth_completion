@@ -8,6 +8,12 @@
 /core
 /core.*
 /src/ffs_ros/ffs_runtime/scripts/core
+/camera_test_output/
+/src/collector/data/*
+!/src/collector/data/.gitkeep
+/src/innovusion_zed/data/EM4_calibration*/
+/src/innovusion_zed/data/remap*/
+/src/innovusion_zed/data/**/depth_denoised/
 *.bag
 *.bag.active
 

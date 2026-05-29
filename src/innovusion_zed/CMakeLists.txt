@@ -56,18 +56,6 @@ target_link_libraries(${PROJECT_NAME}_node
   ${PCL_LIBRARIES}
 )
 
-add_executable(true_data_collector_node
-  src/true_data_collector_node.cpp
-  src/parameter.cpp
-  src/completion_model.cpp
-)
-
-target_link_libraries(true_data_collector_node
-  ${catkin_LIBRARIES}
-  ${PCL_LIBRARIES}
-  ${Boost_LIBRARIES}
-)
-
 # # 添加OpenMP链接
 # if(OpenMP_CXX_FOUND)
 #     target_link_libraries(${PROJECT_NAME}_node OpenMP::OpenMP_CXX)

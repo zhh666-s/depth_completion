@@ -17,7 +17,8 @@ import cv2
 
 def parse_args():
     p=argparse.ArgumentParser()
-    p.add_argument('--data-dir', required=True)
+    p.add_argument('--data-dir', required=True, nargs='+',
+                   help='One or more true_data directories. Samples from all directories are calibrated together.')
     p.add_argument('--config', default='src/innovusion_zed/config/camera_left.json')
     p.add_argument('--out-dir', required=True)
     p.add_argument('--pattern-cols', type=int, default=9)
@@ -25,7 +26,7 @@ def parse_args():
     p.add_argument('--square-size', type=float, default=0.13)
     return p.parse_args()
 args=parse_args()
-DATA=Path(args.data_dir); CFG=Path(args.config); OUTDIR=Path(args.out_dir); OUTDIR.mkdir(parents=True,exist_ok=True)
+DATA_DIRS=[Path(x) for x in args.data_dir]; CFG=Path(args.config); OUTDIR=Path(args.out_dir); OUTDIR.mkdir(parents=True,exist_ok=True)
 PATTERN=(args.pattern_cols,args.pattern_rows); SQUARE=args.square_size
 AX=np.array([[0,0,1],[0,-1,0],[1,0,0]], dtype=np.float64)
 cfg=json.load(open(CFG)); K=np.array(cfg['intrinsic'],float).reshape(3,3); dist=np.array(cfg['distortion'],float).reshape(-1,1)
@@ -78,34 +79,37 @@ def project(xyz,R,t):
     if valid.any(): uv[valid]=cv2.projectPoints(cam[valid].reshape(-1,1,3),np.zeros(3),np.zeros(3),K,dist)[0].reshape(-1,2)
     return uv,cam
 pairs=[]; rejected=[]
-for imgp in sorted((DATA/'left').glob('*.png')):
-    stem=imgp.stem; pcdp=DATA/'pcd'/(stem+'.pcd')
-    if not pcdp.exists(): continue
-    img=cv2.imread(str(imgp),0)
-    ok,corners=cv2.findChessboardCornersSB(img,PATTERN,flags=cv2.CALIB_CB_NORMALIZE_IMAGE) if hasattr(cv2,'findChessboardCornersSB') else (False,None)
-    if not ok:
-        ok,corners=cv2.findChessboardCorners(img,PATTERN,flags=cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_NORMALIZE_IMAGE)
-        if ok: cv2.cornerSubPix(img,corners,(11,11),(-1,-1),(cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER,30,0.001))
-    if not ok:
-        rejected.append((stem,'no_corners')); continue
-    ok,rvec,tvec=cv2.solvePnP(objp,corners,K,dist,flags=cv2.SOLVEPNP_ITERATIVE)
-    if not ok:
-        rejected.append((stem,'solvepnp_fail')); continue
-    Rb=r_to_R(rvec.ravel()); tb=tvec.ravel(); nc=Rb[:,2]; nc/=np.linalg.norm(nc); dc=-nc@tb
-    if dc<0: nc=-nc; dc=-dc
-    board_center=Rb@np.array([SQUARE*(PATTERN[0]-1)/2,SQUARE*(PATTERN[1]-1)/2,0.0])+tb
-    xyz=read_pcd(pcdp); xyz=xyz[np.isfinite(xyz).all(axis=1)]
-    uv,cam=project(xyz,R0,t0); x0,y0=corners.reshape(-1,2).min(0); x1,y1=corners.reshape(-1,2).max(0)
-    margin=120
-    mask=(uv[:,0]>x0-margin)&(uv[:,0]<x1+margin)&(uv[:,1]>y0-margin)&(uv[:,1]<y1+margin)&(cam[:,2]>max(0.2,tb[2]-2.0))&(cam[:,2]<tb[2]+2.0)
-    cand=xyz[mask]; fit=ransac(cand)
-    if fit is None:
-        rejected.append((stem,f'plane_fail cand={len(cand)}')); continue
-    nl,dl,cl,inliers,total=fit
-    if (R0@nl)@nc<0: nl=-nl; dl=-dl
-    pairs.append(dict(stem=stem,nc=nc,dc=dc,nl=nl,dl=dl,cl=cl,center_cam=board_center,inliers=inliers,total=total,cam_z=tb[2]))
-print('DATA',DATA,'pairs',len(pairs),'rejected',len(rejected))
+for DATA in DATA_DIRS:
+    for imgp in sorted((DATA/'left').glob('*.png')):
+        stem=imgp.stem; sample_id=f'{DATA.name}/{stem}'; pcdp=DATA/'pcd'/(stem+'.pcd')
+        if not pcdp.exists(): continue
+        img=cv2.imread(str(imgp),0)
+        ok,corners=cv2.findChessboardCornersSB(img,PATTERN,flags=cv2.CALIB_CB_NORMALIZE_IMAGE) if hasattr(cv2,'findChessboardCornersSB') else (False,None)
+        if not ok:
+            ok,corners=cv2.findChessboardCorners(img,PATTERN,flags=cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_NORMALIZE_IMAGE)
+            if ok: cv2.cornerSubPix(img,corners,(11,11),(-1,-1),(cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER,30,0.001))
+        if not ok:
+            rejected.append((sample_id,'no_corners')); continue
+        ok,rvec,tvec=cv2.solvePnP(objp,corners,K,dist,flags=cv2.SOLVEPNP_ITERATIVE)
+        if not ok:
+            rejected.append((sample_id,'solvepnp_fail')); continue
+        Rb=r_to_R(rvec.ravel()); tb=tvec.ravel(); nc=Rb[:,2]; nc/=np.linalg.norm(nc); dc=-nc@tb
+        if dc<0: nc=-nc; dc=-dc
+        board_center=Rb@np.array([SQUARE*(PATTERN[0]-1)/2,SQUARE*(PATTERN[1]-1)/2,0.0])+tb
+        xyz=read_pcd(pcdp); xyz=xyz[np.isfinite(xyz).all(axis=1)]
+        uv,cam=project(xyz,R0,t0); x0,y0=corners.reshape(-1,2).min(0); x1,y1=corners.reshape(-1,2).max(0)
+        margin=120
+        mask=(uv[:,0]>x0-margin)&(uv[:,0]<x1+margin)&(uv[:,1]>y0-margin)&(uv[:,1]<y1+margin)&(cam[:,2]>max(0.2,tb[2]-2.0))&(cam[:,2]<tb[2]+2.0)
+        cand=xyz[mask]; fit=ransac(cand)
+        if fit is None:
+            rejected.append((sample_id,f'plane_fail cand={len(cand)}')); continue
+        nl,dl,cl,inliers,total=fit
+        if (R0@nl)@nc<0: nl=-nl; dl=-dl
+        pairs.append(dict(stem=sample_id,nc=nc,dc=dc,nl=nl,dl=dl,cl=cl,center_cam=board_center,inliers=inliers,total=total,cam_z=tb[2]))
+print('DATA_DIRS',[str(x) for x in DATA_DIRS],'pairs',len(pairs),'rejected',len(rejected))
 for item in rejected[:20]: print('reject',item)
+if not pairs:
+    raise RuntimeError('No valid calibration pairs were found. Check data directories, checkerboard pattern size, and PCD files.')
 
 def plane_metrics(R,t):
     ang=[]; dist=[]
@@ -162,7 +166,7 @@ for r in rows:
     print(f"{r['name']:<35} plane_dist_mean={r['dist_abs']:.4f}m plane_ang_mean={r['ang_mean']:.3f}deg center_mean={r['center_mean']:.3f}m delta_t={r['dt_norm']:.3f}m delta_R={r['drot']:.3f}deg dt_vec={r['dt_vec']}")
 for i,r in enumerate(rows[:6]):
     out=json.loads(json.dumps(cfg)); out['rotation']=[float(x) for x in r['Rst'].reshape(-1)]; out['translation']=[float(x) for x in r['tst']]
-    out['_auto_calib_method']=r['name']; out['_source_data']=str(DATA); out['_reference_config']=str(CFG); out['_used_samples']=[p['stem'] for p in pairs]
+    out['_auto_calib_method']=r['name']; out['_source_data']=[str(x) for x in DATA_DIRS]; out['_reference_config']=str(CFG); out['_used_samples']=[p['stem'] for p in pairs]
     out['_metrics']={k:float(r[k]) for k in ['ang_mean','ang_max','dist_abs','dist_max','center_mean','center_max','drot','dt_norm']}; out['_delta_translation']=[float(x) for x in r['dt_vec']]
     path=OUTDIR/f'candidate_{i+1}_{r["name"]}.json'.replace('/','_')
     json.dump(out,open(path,'w'),indent=4); print('wrote',path)

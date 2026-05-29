@@ -24,11 +24,11 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/image_encodings.h>
 
-#include "innovusion_zed/completion_model.hpp"
+#include "collector/completion_model.hpp"
 
-class TrueDataCollector {
+class FalconsZedCollector {
 public:
-    TrueDataCollector()
+    FalconsZedCollector()
         : private_nh_("~"),
           completion_module_(getParam<std::string>("param_path",
                              ros::package::getPath("innovusion_zed") + "/config/camera_left.json")) {
@@ -36,7 +36,7 @@ public:
         private_nh_.param("preview_window", preview_window_, true);
 
         const std::string default_output_dir =
-            ros::package::getPath("innovusion_zed") + "/true_data";
+            ros::package::getPath("collector") + "/data/falcons_zed";
         private_nh_.param("output_dir", output_dir_, default_output_dir);
         private_nh_.param("lidar_topic", lidar_topic_, std::string("/iv_points"));
         private_nh_.param("cam_topic", cam_topic_, std::string("/camera/left/image_raw"));
@@ -49,22 +49,22 @@ public:
             cv::namedWindow(window_name_, cv::WINDOW_NORMAL);
         }
 
-        lidar_sub_ = nh_.subscribe(lidar_topic_, 10, &TrueDataCollector::lidarCallback, this);
+        lidar_sub_ = nh_.subscribe(lidar_topic_, 10, &FalconsZedCollector::lidarCallback, this);
         if (isCompressedImageTopic(cam_topic_)) {
             compressed_image_sub_ =
-                nh_.subscribe(cam_topic_, 60, &TrueDataCollector::compressedImageCallback, this);
+                nh_.subscribe(cam_topic_, 60, &FalconsZedCollector::compressedImageCallback, this);
         } else {
             raw_image_sub_ =
-                nh_.subscribe(cam_topic_, 10, &TrueDataCollector::rawImageCallback, this);
+                nh_.subscribe(cam_topic_, 10, &FalconsZedCollector::rawImageCallback, this);
         }
 
-        ROS_INFO_STREAM("true_data_collector lidar_topic: " << lidar_topic_);
-        ROS_INFO_STREAM("true_data_collector cam_topic: " << cam_topic_);
-        ROS_INFO_STREAM("true_data_collector output_dir: " << output_dir_);
-        ROS_INFO("true_data_collector manual mode: press 's' or Space in the image window to save, 'q' or Esc to quit.");
+        ROS_INFO_STREAM("falcons_zed_collector lidar_topic: " << lidar_topic_);
+        ROS_INFO_STREAM("falcons_zed_collector cam_topic: " << cam_topic_);
+        ROS_INFO_STREAM("falcons_zed_collector output_dir: " << output_dir_);
+        ROS_INFO("falcons_zed_collector manual mode: press 's' or Space in the image window to save, 'q' or Esc to quit.");
     }
 
-    ~TrueDataCollector() {
+    ~FalconsZedCollector() {
         if (preview_window_) {
             cv::destroyWindow(window_name_);
         }
@@ -128,7 +128,7 @@ private:
 
     void lidarCallback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg) {
         if (!logged_cloud_fields_) {
-            ROS_INFO_STREAM("true_data_collector PointCloud2 fields: "
+            ROS_INFO_STREAM("falcons_zed_collector PointCloud2 fields: "
                             << describeCloudFields(*cloud_msg));
             logged_cloud_fields_ = true;
         }
@@ -157,7 +157,7 @@ private:
         if (key == 's' || key == 'S' || key == 32) {
             saveLatestSample();
         } else if (key == 'q' || key == 'Q' || key == 27) {
-            ROS_INFO("true_data_collector quitting by keyboard request.");
+            ROS_INFO("falcons_zed_collector quitting by keyboard request.");
             ros::shutdown();
         }
     }
@@ -220,7 +220,7 @@ private:
         }
 
         ++saved_samples_;
-        ROS_INFO_STREAM("Saved true_data sample " << saved_samples_ << ": "
+        ROS_INFO_STREAM("Saved falcons_zed sample " << saved_samples_ << ": "
                         << stem.str() << ", image_stamp=" << image_stamp
                         << ", cloud_stamp=" << cloud_stamp);
     }
@@ -267,16 +267,16 @@ private:
 
         logged_intensity_stats_ = true;
         if (finite_count == 0) {
-            ROS_WARN_STREAM("true_data_collector intensity stats: no finite intensity values.");
+            ROS_WARN_STREAM("falcons_zed_collector intensity stats: no finite intensity values.");
             return;
         }
 
-        ROS_INFO_STREAM("true_data_collector intensity stats: min=" << min_intensity
+        ROS_INFO_STREAM("falcons_zed_collector intensity stats: min=" << min_intensity
                         << ", max=" << max_intensity
                         << ", nonzero=" << nonzero_count
                         << "/" << finite_count);
         if (nonzero_count == 0) {
-            ROS_WARN_STREAM("true_data_collector parsed intensity is all zero. "
+            ROS_WARN_STREAM("falcons_zed_collector parsed intensity is all zero. "
                             "If the field list above contains no intensity/reflectivity-like "
                             "field, check the lidar driver output topic.");
         }
@@ -412,7 +412,7 @@ private:
     int saved_samples_ = 0;
     double depth_scale_ = 1000.0;
     bool preview_window_ = true;
-    const std::string window_name_ = "true_data_collector_left";
+    const std::string window_name_ = "falcons_zed_collector_left";
     cv::Mat latest_image_;
     ros::Time latest_image_stamp_;
     bool has_latest_image_ = false;
@@ -426,8 +426,8 @@ private:
 };
 
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "true_data_collector_node");
-    TrueDataCollector collector;
+    ros::init(argc, argv, "falcons_zed_collector_node");
+    FalconsZedCollector collector;
     ros::spin();
     return 0;
 }
