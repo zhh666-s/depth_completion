@@ -7,6 +7,7 @@
 # Crash dumps and large local artifacts
 /core
 /core.*
+/.docker-export/
 /src/ffs_ros/ffs_runtime/scripts/core
 /camera_test_output/
 /src/collector/data/*
